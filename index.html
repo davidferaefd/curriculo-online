@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Crie um currículo profissional, versátil e pronto para oportunidades em tecnologia ou áreas gerais.">
+  <title>Currículo — Gerador inteligente</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"]
+          },
+          colors: {
+            ink: "#101828",
+            muted: "#667085",
+            line: "#e7eaf0",
+            canvas: "#f5f7fb",
+            accent: "#6558e8"
+          },
+          boxShadow: {
+            panel: "0 10px 35px rgba(16, 24, 40, .06)"
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    :root { color-scheme: light; }
+    html { scroll-behavior: smooth; }
+    body { min-width: 320px; }
+    .field {
+      width: 100%;
+      border: 1px solid #dfe3eb;
+      border-radius: 9px;
+      background: #fff;
+      padding: 10px 12px;
+      color: #101828;
+      font-size: 13px;
+      line-height: 1.45;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+    .field::placeholder { color: #98a2b3; }
+    .field:focus { border-color: #8177ef; box-shadow: 0 0 0 3px rgba(101, 88, 232, .12); }
+    textarea.field { min-height: 88px; resize: vertical; }
+    .label { display: block; margin-bottom: 6px; color: #344054; font-size: 12px; font-weight: 600; }
+    .section-kicker { letter-spacing: .13em; }
+    .resume-preview {
+      width: 100%;
+      max-width: 794px;
+      min-height: 1123px;
+      margin: 0 auto;
+      background: white;
+      color: #1d2939;
+      font-family: Arial, Helvetica, sans-serif;
+      box-shadow: 0 14px 45px rgba(16, 24, 40, .12);
+    }
+    .resume-preview a { color: inherit; text-decoration: none; overflow-wrap: anywhere; }
+    .resume-preview .resume-section { margin-top: 21px; }
+    .resume-preview .resume-section h2 {
+      margin: 0 0 9px;
+      padding-bottom: 5px;
+      border-bottom: 1px solid #d0d5dd;
+      color: #344054;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .resume-preview .entry + .entry { margin-top: 11px; }
+    .resume-preview .entry-heading { display: flex; justify-content: space-between; gap: 12px; }
+    .resume-preview .entry-title { font-size: 11px; font-weight: 700; }
+    .resume-preview .entry-date { flex-shrink: 0; color: #667085; font-size: 9px; }
+    .resume-preview .entry-subtitle { margin-top: 2px; color: #475467; font-size: 9px; }
+    .resume-preview .entry-description { margin-top: 4px; color: #475467; font-size: 9px; line-height: 1.5; white-space: pre-line; }
+    .resume-preview .contact-line { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px 12px; }
+    .resume-preview .skill-line { color: #475467; font-size: 9px; line-height: 1.7; }
+    .resume-preview .summary-copy { color: #475467; font-size: 9.5px; line-height: 1.6; white-space: pre-line; }
+    @media print {
+      @page { size: A4; margin: 12mm 14mm; }
+      html, body { width: 210mm; min-width: 0; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+      body * { visibility: hidden !important; }
+      #resume-preview, #resume-preview * { visibility: visible !important; }
+      #resume-preview {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 182mm !important;
+        max-width: none !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        zoom: .94;
+      }
+      #resume-preview .resume-section { margin-top: 14px; }
+      #resume-preview .entry + .entry { margin-top: 7px; }
+      #resume-preview .summary-copy, #resume-preview .entry-description { font-size: 8.5px; }
+      #resume-preview .resume-section h2 { margin-bottom: 6px; }
+      a { text-decoration: none !important; }
+    }
+  </style>
+</head>
+<body class="bg-canvas font-sans text-ink antialiased">
+  <header class="border-b border-line bg-white">
+    <div class="mx-auto flex max-w-[1500px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <a href="#" class="flex items-center gap-3" aria-label="Início do gerador de currículo">
+        <span class="grid h-9 w-9 place-items-center rounded-xl bg-accent text-sm font-bold text-white">cv</span>
+        <span>
+          <span class="block text-sm font-semibold tracking-tight">Currículo</span>
+          <span class="block text-[11px] text-muted">Gerador inteligente</span>
+        </span>
+      </a>
+      <div class="flex items-center gap-2">
+        <span id="save-status" class="hidden text-xs text-muted sm:inline">Salvo neste dispositivo</span>
+        <button id="copy-button" type="button" class="rounded-lg border border-line bg-white px-3 py-2 text-xs font-semibold text-ink transition hover:bg-gray-50 sm:px-4 sm:text-sm">
+          Copiar código HTML
+        </button>
+        <button id="print-button" type="button" class="rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-violet-700 sm:px-4 sm:text-sm">
+          Baixar PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="mx-auto max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+    <div class="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div>
+        <p class="section-kicker mb-2 text-[10px] font-bold uppercase text-accent">Seu próximo passo começa aqui</p>
+        <h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Monte um currículo que abre portas.</h1>
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-muted">Apresente suas competências para vagas em tecnologia e também para oportunidades gerais. As alterações aparecem no currículo ao lado.</p>
+      </div>
+      <button id="reset-button" type="button" class="self-start rounded-lg px-3 py-2 text-xs font-semibold text-muted transition hover:bg-white hover:text-ink sm:self-auto">Limpar formulário</button>
+    </div>
+
+    <div class="grid items-start gap-6 xl:grid-cols-[minmax(420px,0.92fr)_minmax(520px,1.08fr)]">
+      <section aria-label="Formulário do currículo" class="space-y-4">
+        <form id="resume-form" class="space-y-4" autocomplete="on">
+          <section class="rounded-2xl border border-line bg-white p-5 shadow-panel sm:p-6">
+            <div class="mb-5 flex items-center gap-3">
+              <span class="grid h-8 w-8 place-items-center rounded-lg bg-violet-50 text-sm font-semibold text-accent">01</span>
+              <div><h2 class="text-sm font-semibold">Informações pessoais</h2><p class="mt-0.5 text-xs text-muted">Como recrutadores podem entrar em contato.</p></div>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2">
+              <label class="sm:col-span-2"><span class="label">Nome completo</span><input class="field" name="name" placeholder="Ex.: Maria da Silva" autocomplete="name"></label>
+              <label class="sm:col-span-2"><span class="label">Cargo ou objetivo profissional</span><input class="field" name="role" value="Profissional em busca de oportunidades | Aspirante a Desenvolvedor" placeholder="Ex.: Assistente administrativo | Desenvolvedor júnior"></label>
+              <label><span class="label">E-mail</span><input class="field" name="email" type="email" placeholder="voce@email.com" autocomplete="email"></label>
+              <label><span class="label">Telefone</span><input class="field" name="phone" type="tel" placeholder="(00) 00000-0000" autocomplete="tel"></label>
+              <label><span class="label">Cidade / Estado</span><input class="field" name="location" placeholder="Ex.: São Paulo, SP" autocomplete="address-level2"></label>
+              <label><span class="label">LinkedIn</span><input class="field" name="linkedin" type="url" placeholder="linkedin.com/in/seu-perfil"></label>
+              <label class="sm:col-span-2"><span class="label">GitHub ou portfólio</span><input class="field" name="github" type="url" placeholder="github.com/seu-usuario"></label>
+            </div>
+          </section>
+
+          <section class="rounded-2xl border border-line bg-white p-5 shadow-panel sm:p-6">
+            <div class="mb-4 flex items-center gap-3">
+              <span class="grid h-8 w-8 place-items-center rounded-lg bg-violet-50 text-sm font-semibold text-accent">02</span>
+              <div><h2 class="text-sm font-semibold">Resumo profissional</h2><p class="mt-0.5 text-xs text-muted">Adapte o texto para cada vaga.</p></div>
+            </div>
+            <label><span class="label">Apresentação</span><textarea class="field" name="summary">Estudante de Computação em Nuvem e Web Services em Linux, com disposição para aprender e contribuir em diferentes ambientes profissionais. Tenho perfil disciplinado, proativo e colaborativo, foco em resultados e interesse em desenvolver soluções práticas. Busco uma oportunidade para aplicar minhas competências, assumir responsabilidades e crescer profissionalmente.</textarea></label>
+          </section>
+
+          <section class="rounded-2xl border border-line bg-white p-5 shadow-panel sm:p-6">
+            <div class="mb-4 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3"><span class="grid h-8 w-8 place-items-center rounded-lg bg-violet-50 text-sm font-semibold text-accent">03</span><div><h2 class="text-sm font-semibold">Experiência e atuação</h2><p class="mt-0.5 text-xs text-muted">Inclua empregos, serviços, voluntariado ou projetos.</p></div></div>
+              <button type="button" class="add-entry" data-list="experience" aria-label="Adicionar experiência">+</button>
+            </div>
+            <div id="experience-list" class="space-y-3"></div>
+          </section>
+
+          <section class="rounded-2xl border border-line bg-white p-5 shadow-panel sm:p-6">
+            <div class="mb-4 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3"><span class="grid h-8 w-8 place-items-center rounded-lg bg-violet-50 text-sm font-semibold text-accent">04</span><div><h2 class="text-sm font-semibold">Formação acadêmica</h2><p class="mt-0.5 text-xs text-muted">Cursos em andamento também contam.</p></div></div>
+              <button type="button" class="add-entry" data-list="education" aria-label="Adicionar formação">+</button>
+            </div>
+            <div id="education-list" class="space-y-3"></div>
+          </section>
+
+          <section class="rounded-2xl border border-line bg-white p-5 shadow-panel sm:p-6">
+            <div class="mb-4 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3"><span class="grid h-8 w-8 place-items-center rounded-lg bg-violet-50 text-sm font-semibold text-accent">05</span><div><h2 class="text-sm font-semibold">Projetos e prática em TI</h2><p class="mt-0.5 text-xs text-muted">Mostre o que você já construiu e aprendeu.</p></div></div>
+              <button type="button" class="add-entry" data-list="projects" aria-label="Adicionar projeto">+</button>
+            </div>
+            <div id="projects-list" class="space-y-3"></div>
+          </section>
+
+          <section class="rounded-2xl border border-line bg-white p-5 shadow-panel sm:p-6">
+            <div class="mb-4 flex items-center gap-3">
+              <span class="grid h-8 w-8 place-items-center rounded-lg bg-violet-50 text-sm font-semibold text-accent">06</span>
+              <div><h2 class="text-sm font-semibold">Habilidades</h2><p class="mt-0.5 text-xs text-muted">Separe cada habilidade com vírgula.</p></div>
+            </div>
+            <div class="space-y-4">
+              <label><span class="label">Competências técnicas</span><textarea class="field" name="technical" placeholder="Python, Git, Linux, MySQL, SQLite, HTML, CSS">Python, Git, Linux, MySQL, SQLite, HTML, CSS, JavaScript</textarea></label>
+              <label><span class="label">Competências comportamentais</span><textarea class="field" name="soft" placeholder="Comunicação, trabalho em equipe, organização">Aprendizado rápido, disciplina, proatividade, trabalho em equipe, comunicação, resolução de problemas</textarea></label>
+            </div>
+          </section>
+        </form>
+        <p class="px-1 text-xs leading-5 text-muted">Dica: use palavras-chave da vaga e descreva resultados reais. Não inclua informações que você não possa comprovar.</p>
+      </section>
+
+      <section class="xl:sticky xl:top-5" aria-label="Pré-visualização do currículo">
+        <div class="mb-3 flex items-center justify-between">
+          <div><h2 class="text-sm font-semibold">Pré-visualização</h2><p class="mt-1 text-xs text-muted">Formato limpo e compatível com sistemas ATS.</p></div>
+          <span class="rounded-full border border-line bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-muted">A4 · ATS-friendly</span>
+        </div>
+        <div class="overflow-hidden rounded-xl border border-line bg-[#e9edf4] p-3 sm:p-5">
+          <article id="resume-preview" class="resume-preview px-8 py-9 sm:px-11 sm:py-12" aria-live="polite"></article>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite" class="pointer-events-none fixed bottom-5 left-1/2 z-50 -translate-x-1/2 translate-y-3 rounded-xl bg-ink px-4 py-3 text-sm font-medium text-white opacity-0 shadow-lg transition-all"></div>
+
+  <script>
+    "use strict";
+
+    const STORAGE_KEY = "curriculo-inteligente-v1";
+    const form = document.querySelector("#resume-form");
+    const preview = document.querySelector("#resume-preview");
+    const toast = document.querySelector("#toast");
+    const fields = {
+      experience: [
+        { title: "", organization: "", period: "", description: "" }
+      ],
+      education: [
+        { title: "Computação em Nuvem e Web Services em Linux", organization: "", period: "Em andamento", description: "" },
+        { title: "Ensino Médio", organization: "", period: "", description: "" }
+      ],
+      projects: [
+        { title: "", technologies: "", url: "", description: "" }
+      ]
+    };
+    let toastTimer;
+    let saveTimer;
+
+    const esc = (value = "") => String(value).replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    })[char]);
+
+    function safeUrl(value) {
+      const raw = String(value || "").trim();
+      if (!raw) return "";
+      const candidate = /^[a-z][a-z\d+.-]*:/i.test(raw) ? raw : `https://${raw}`;
+      try {
+        const parsed = new URL(candidate);
+        return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+      } catch {
+        return "";
+      }
+    }
+
+    function getFormData() {
+      return Object.fromEntries(new FormData(form).entries());
+    }
+
+    function fieldMarkup(label, key, value, placeholder = "", multiline = false) {
+      const control = multiline
+        ? `<textarea class="field" data-key="${key}" placeholder="${esc(placeholder)}">${esc(value)}</textarea>`
+        : `<input class="field" data-key="${key}" value="${esc(value)}" placeholder="${esc(placeholder)}">`;
+      return `<label class="block"><span class="label">${label}</span>${control}</label>`;
+    }
+
+    function renderEntryList(type) {
+      const container = document.querySelector(`#${type}-list`);
+      const definitions = {
+        experience: [
+          ["title", "Cargo / atividade", "Ex.: Atendente, freelancer, voluntário"],
+          ["organization", "Empresa / organização", "Nome do local ou cliente"],
+          ["period", "Período", "Ex.: jan. 2024 – atual"],
+          ["description", "Principais atividades e resultados", "Descreva suas responsabilidades e resultados (uma ideia por linha).", true]
+        ],
+        education: [
+          ["title", "Curso / formação", "Nome do curso"],
+          ["organization", "Instituição", "Nome da instituição"],
+          ["period", "Período ou previsão", "Ex.: 2025 – 2027"],
+          ["description", "Complemento (opcional)", "Ênfase, certificação ou informação relevante", true]
+        ],
+        projects: [
+          ["title", "Nome do projeto", "Ex.: Aplicativo de controle de tarefas"],
+          ["technologies", "Tecnologias", "Ex.: Python, CustomTkinter, SQLite"],
+          ["url", "Link do projeto", "github.com/seu-usuario/projeto"],
+          ["description", "O que você desenvolveu", "Explique brevemente o problema e sua solução.", true]
+        ]
+      };
+      const labels = definitions[type];
+      container.innerHTML = fields[type].map((entry, index) => `
+        <div class="entry-card rounded-xl border border-line bg-gray-50/70 p-4" data-index="${index}">
+          <div class="mb-3 flex items-center justify-between"><span class="text-[11px] font-semibold uppercase tracking-wide text-muted">${type === "experience" ? "Experiência" : type === "education" ? "Formação" : "Projeto"} ${index + 1}</span>
+            <button type="button" class="remove-entry rounded-md px-2 py-1 text-xs font-medium text-gray-400 transition hover:bg-red-50 hover:text-red-600" data-list="${type}" data-index="${index}" aria-label="Remover item">Remover</button>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-2">
+            ${labels.map(([key, label, placeholder, multiline]) => `<div class="${key === "description" ? "sm:col-span-2" : ""}">${fieldMarkup(label, key, entry[key], placeholder, multiline)}</div>`).join("")}
+          </div>
+        </div>`).join("");
+    }
+
+    function renderListInputs() {
+      Object.keys(fields).forEach(renderEntryList);
+    }
+
+    function getListValues(type, includeEmpty = false) {
+      return [...document.querySelectorAll(`#${type}-list .entry-card`)].map((card) => {
+        const data = {};
+        card.querySelectorAll("[data-key]").forEach((input) => { data[input.dataset.key] = input.value.trim(); });
+        return data;
+      }).filter((item) => includeEmpty || Object.values(item).some(Boolean));
+    }
+
+    function section(title, body) {
+      return body ? `<section class="resume-section"><h2>${title}</h2>${body}</section>` : "";
+    }
+
+    function renderEntries(items, type) {
+      return items.map((item) => {
+        const heading = item.title ? `<span class="entry-title">${esc(item.title)}</span>` : "";
+        const date = item.period ? `<span class="entry-date">${esc(item.period)}</span>` : "";
+        const subtitleValue = type === "projects" ? item.technologies : item.organization;
+        const subtitle = subtitleValue ? `<div class="entry-subtitle">${type === "projects" ? "Tecnologias: " : ""}${esc(subtitleValue)}</div>` : "";
+        const description = item.description ? `<div class="entry-description">${esc(item.description)}</div>` : "";
+        const projectLink = type === "projects" && safeUrl(item.url)
+          ? `<div class="entry-subtitle"><a href="${esc(safeUrl(item.url))}" target="_blank" rel="noopener noreferrer">${esc(item.url)}</a></div>` : "";
+        if (!heading && !date && !subtitle && !description && !projectLink) return "";
+        return `<div class="entry"><div class="entry-heading">${heading}${date}</div>${subtitle}${projectLink}${description}</div>`;
+      }).join("");
+    }
+
+    function renderResume() {
+      const data = getFormData();
+      const contact = [
+        data.email ? `<a href="mailto:${esc(data.email)}">${esc(data.email)}</a>` : "",
+        data.phone ? `<a href="tel:${esc(data.phone.replace(/[^\d+]/g, ""))}">${esc(data.phone)}</a>` : "",
+        data.location ? esc(data.location) : "",
+        data.linkedin && safeUrl(data.linkedin) ? `<a href="${esc(safeUrl(data.linkedin))}" target="_blank" rel="noopener noreferrer">LinkedIn</a>` : "",
+        data.github && safeUrl(data.github) ? `<a href="${esc(safeUrl(data.github))}" target="_blank" rel="noopener noreferrer">GitHub / Portfólio</a>` : ""
+      ].filter(Boolean);
+      const name = data.name.trim() || "Seu Nome Completo";
+      const role = data.role.trim();
+      const summary = data.summary.trim();
+      const technical = data.technical.split(",").map((value) => value.trim()).filter(Boolean);
+      const soft = data.soft.split(",").map((value) => value.trim()).filter(Boolean);
+      const skills = [
+        technical.length ? `<div class="skill-line"><strong>Competências técnicas:</strong> ${technical.map(esc).join(" · ")}</div>` : "",
+        soft.length ? `<div class="skill-line"><strong>Competências comportamentais:</strong> ${soft.map(esc).join(" · ")}</div>` : ""
+      ].join("");
+
+      preview.innerHTML = `
+        <header class="border-b-2 border-ink pb-4 text-center">
+          <h1 class="text-[25px] font-bold uppercase leading-tight tracking-wide">${esc(name)}</h1>
+          ${role ? `<p class="mt-2 text-[11px] font-semibold text-gray-600">${esc(role)}</p>` : ""}
+          ${contact.length ? `<div class="contact-line mt-3 text-[9px] text-gray-600">${contact.join('<span aria-hidden="true">·</span>')}</div>` : ""}
+        </header>
+        ${section("Resumo profissional", summary ? `<p class="summary-copy">${esc(summary)}</p>` : "")}
+        ${section("Experiência e histórico de atuação", renderEntries(getListValues("experience"), "experience"))}
+        ${section("Formação acadêmica", renderEntries(getListValues("education"), "education"))}
+        ${section("Projetos e prática em tecnologia", renderEntries(getListValues("projects"), "projects"))}
+        ${section("Habilidades", skills)}
+      `;
+      queueSave();
+    }
+
+    function snapshot() {
+      return {
+        profile: getFormData(),
+        lists: Object.fromEntries(Object.keys(fields).map((type) => [type, getListValues(type)]))
+      };
+    }
+
+    function queueSave() {
+      window.clearTimeout(saveTimer);
+      saveTimer = window.setTimeout(() => {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot()));
+          const status = document.querySelector("#save-status");
+          status.textContent = "Salvo neste dispositivo";
+          status.classList.remove("hidden");
+        } catch (error) {
+          console.error("Não foi possível salvar o currículo neste dispositivo.", error);
+          showToast("Não foi possível salvar automaticamente neste dispositivo.");
+        }
+      }, 250);
+    }
+
+    function loadSavedData() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw);
+        if (saved.profile && typeof saved.profile === "object") {
+          Object.entries(saved.profile).forEach(([name, value]) => {
+            const input = form.elements.namedItem(name);
+            if (input && typeof value === "string") input.value = value;
+          });
+        }
+        if (saved.lists && typeof saved.lists === "object") {
+          Object.keys(fields).forEach((type) => {
+            if (Array.isArray(saved.lists[type]) && saved.lists[type].length > 0) {
+              fields[type] = saved.lists[type].map((item) => ({
+                ...Object.fromEntries(["title", "organization", "period", "description", "technologies", "url"].map((key) => [key, typeof item[key] === "string" ? item[key] : ""]))
+              }));
+            }
+          });
+        }
+      } catch (error) {
+        console.error("Não foi possível carregar os dados salvos do currículo.", error);
+        showToast("Os dados salvos não puderam ser carregados.");
+      }
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.remove("translate-y-3", "opacity-0");
+      toast.classList.add("translate-y-0", "opacity-100");
+      window.clearTimeout(toastTimer);
+      toastTimer = window.setTimeout(() => {
+        toast.classList.add("translate-y-3", "opacity-0");
+        toast.classList.remove("translate-y-0", "opacity-100");
+      }, 2600);
+    }
+
+    function addEntry(type) {
+      fields[type] = getListValues(type, true);
+      fields[type].push({ title: "", organization: "", period: "", description: "", technologies: "", url: "" });
+      renderEntryList(type);
+      renderResume();
+    }
+
+    document.querySelectorAll(".add-entry").forEach((button) => {
+      button.classList.add("grid", "h-8", "w-8", "shrink-0", "place-items-center", "rounded-lg", "border", "border-line", "text-lg", "text-accent", "transition", "hover:bg-violet-50");
+      button.addEventListener("click", () => addEntry(button.dataset.list));
+    });
+
+    document.addEventListener("input", (event) => {
+      if (event.target.matches("#resume-form input, #resume-form textarea")) renderResume();
+    });
+
+    document.addEventListener("click", (event) => {
+      const button = event.target.closest(".remove-entry");
+      if (!button) return;
+      const type = button.dataset.list;
+      fields[type] = getListValues(type, true);
+      fields[type].splice(Number(button.dataset.index), 1);
+      renderEntryList(type);
+      renderResume();
+    });
+
+    document.querySelector("#print-button").addEventListener("click", () => window.print());
+
+    document.querySelector("#copy-button").addEventListener("click", async () => {
+      try {
+        const source = `<!DOCTYPE html>\n<html lang="pt-BR">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>Currículo - ${esc(getFormData().name || "Meu nome")}</title>\n<style>body{max-width:800px;margin:40px auto;padding:0 24px;color:#1d2939;font:14px Arial,sans-serif;line-height:1.5}h1{text-align:center;font-size:26px;text-transform:uppercase}header{text-align:center;border-bottom:2px solid #101828;padding-bottom:16px}.contact-line{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 12px;font-size:12px}a{color:inherit;text-decoration:none}.resume-section{margin-top:22px}.resume-section h2{border-bottom:1px solid #d0d5dd;padding-bottom:5px;color:#344054;font-size:13px;letter-spacing:.1em;text-transform:uppercase}.entry+.entry{margin-top:12px}.entry-heading{display:flex;justify-content:space-between;gap:12px}.entry-title{font-weight:bold}.entry-date,.entry-subtitle,.entry-description,.summary-copy,.skill-line{font-size:12px;color:#475467}.entry-description,.summary-copy{white-space:pre-line}.entry-description{margin-top:4px}</style>\n</head>\n<body>\n${preview.innerHTML}\n</body>\n</html>`;
+        await navigator.clipboard.writeText(source);
+        showToast("Código HTML do currículo copiado.");
+      } catch (error) {
+        console.error("Não foi possível copiar o HTML do currículo.", error);
+        showToast("Não foi possível copiar. Verifique a permissão da área de transferência.");
+      }
+    });
+
+    document.querySelector("#reset-button").addEventListener("click", () => {
+      if (!window.confirm("Deseja apagar os dados preenchidos e começar novamente?")) return;
+      form.reset();
+      fields.experience = [{ title: "", organization: "", period: "", description: "" }];
+      fields.education = [
+        { title: "Computação em Nuvem e Web Services em Linux", organization: "", period: "Em andamento", description: "" },
+        { title: "Ensino Médio", organization: "", period: "", description: "" }
+      ];
+      fields.projects = [{ title: "", technologies: "", url: "", description: "" }];
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch (error) {
+        console.error("Não foi possível apagar os dados salvos.", error);
+        showToast("Não foi possível apagar os dados salvos neste dispositivo.");
+      }
+      renderListInputs();
+      renderResume();
+      showToast("Formulário reiniciado.");
+    });
+
+    loadSavedData();
+    renderListInputs();
+    renderResume();
+  </script>
+</body>
+</html>
